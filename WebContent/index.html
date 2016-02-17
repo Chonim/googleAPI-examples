@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Maps Demo ver 1.0</title>
+<link rel="stylesheet"	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="style/style.css" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyBsYVLaGllEz-XZYoF6xv_wqPsrG0k7oFs&libraries=places"></script>
+
+<script src="https://mapstechnical.appspot.com/scripts/mapstechnical.js"></script>
+<script src="https://mapstechnical.appspot.com/scripts/validate_geocoding.js"></script>
+<script src="https://mapstechnical.appspot.com/scripts/validate_directions.js"></script>
+<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+<script src="data.json"></script>
+<script src="app/speed_test.js"></script>
+<script src="app/test.js" charset="utf-8"></script>
+<script src="app/markerclusterer_function.js"></script>
+</head>
+<body>
+	<div class="container">
+		<!-- StreetView<span class="glyphicon glyphicon-picture"></span>를 위한 Modal -->
+		<div class="modal fade" id="myModal" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Street View</h4>
+					</div>
+					<div class="modal-body" id="modalLatlng">
+						<p>이미지 보기</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">닫기</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<h2>Google Maps Demo ver 1.0</h2>
+		<ul class="nav nav-tabs">
+			<li class="active"><a data-toggle="tab" href="#home">장소 또는 주소로 찾기</a></li>
+			<li><a data-toggle="tab" href="#menu2">좌표값으로 찾기</a></li>
+			<li><a data-toggle="tab" href="#menu3">길찾기</a></li>
+			<li class="dropdown"><a class="dropdown-toggle"
+				data-toggle="dropdown" href="#">Marker Cluster<span
+					class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li><a data-toggle="tab" href="#menu4-1"
+						onclick="javascript:onClickMarkerCluster()" id="markerCluster">Advanced</a></li>
+					<li><a data-toggle="tab" href="#menu4-2"
+						onclick="javascript:onClickSpeedTest()" id="speedTest">Speed
+							Test</a></li>
+				</ul></li>
+			<li><a data-toggle="tab" href="#menu5">퓨전테이블</a></li>
+		</ul>
+	</div>
+
+	<div class='col-sm-1'></div>
+	<div class='col-sm-7 map_default'>
+		<div id="map-canvas" style="width: 100%; height: 550px;"></div>
+	</div>
+	<div class='col-sm-3'>
+		<div class="tab-content">
+
+			<div id="home" class="tab-pane fade in active">
+				<h3>장소 또는 주소 찾기</h3>
+				<div class="form-group">
+					<label for="usr">장소, 주소 등으로 검색</label> <input
+						placeholder="위치를 입력해주세요." type="text" class="form-control"id="address">
+				</div>
+				<button type="button" id="addressSearch" class="btn-default2">검색</button>
+				<button type="button" class="btn-info" data-toggle="modal"
+					data-target="#myModal">
+					StreetView <span class="glyphicon glyphicon-picture"></span>
+				</button>
+			</div>
+
+			<div id="menu2" class="tab-pane fade">
+				<h3>좌표값으로 찾기</h3>
+				<div class="form-group">
+					<label for="usr">좌표값으로 검색</label> <input placeholder="좌표값을 입력해주세요." type="text" class="form-control" id="latlng">
+				</div>
+				<button type="button" id="latlngSearch" class="btn btn-default">검색</button>
+				
+				<button type="button" class="btn-info" data-toggle="modal"
+					data-target="#myModal">
+					StreetView <span class="glyphicon glyphicon-picture"></span>
+				</button>
+			</div>
+
+			<div id="menu3" class="tab-pane fade showDirectionsResultWrapper">
+				<h3>길찾기</h3>
+				<button id="addPath" type="button" class="btn btn-link">경유지
+					추가</button>
+				<button id="removeAllWaypoints" type="button" class="btn btn-link">경유지 모두 제거</button>
+				<button id="initPath" type="button" class="btn btn-link">초기화</button>
+				<div id="directions-group" class="form-group directions-group">
+					<label for="usr">경로 지정</label> 
+					<input placeholder="출발 지점을 선택해주세요."
+						type="text" class="form-control" id="path-start"> 
+						<input
+						placeholder="도착 지점을 선택해주세요." type="text" class="form-control"
+						id="path-end" >
+				</div>
+				<button type="button" id="showDirections" class="btn btn-default">길 찾기</button>
+				<div id="directions-panel" class="showDirectionsResult"></div>
+			</div>
+
+			<div id="menu4-1" class="tab-pane fade">
+				<h3>Marker Cluster</h3>
+				<div id="inline-actions">
+					<div>
+						<span class="zoom">Max zoom level:</span><span> <select
+							id="zoom">
+								<option value="-1">Default</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+								<option value="13">13</option>
+								<option value="14">14</option>
+						</select>
+						</span>
+					</div>
+
+					<div>
+						<span class="item">Cluster size:</span><span> <select
+							id="size">
+								<option value="-1">Default</option>
+								<option value="40">40</option>
+								<option value="50">50</option>
+								<option value="70">70</option>
+								<option value="80">80</option>
+						</select>
+						</span>
+					</div>
+
+					<div>
+						<span class="item">Cluster style:</span><span> <select
+							id="style">
+								<option value="-1">Default</option>
+								<option value="0">People</option>
+								<option value="1">Conversation</option>
+								<option value="2">Heart</option>
+								<option value="3">Pin</option>
+						</select>
+						</span>
+						<div>
+							<input id="refresh" type="button" value="Refresh Map"
+								class="item" /> <a href="#" id="clear">Clear</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 속도 테스트 -->
+			<div id="menu4-2" class="tab-pane fade">
+				<h3>속도 테스트</h3>
+				<div>
+					<input type="checkbox" checked="checked" id="usegmm" /> <span>Use
+						MarkerClusterer</span>
+				</div>
+
+				<div>
+					Markers: <select id="nummarkers">
+						<option value="10">10</option>
+						<option value="50">50</option>
+						<option value="100" selected="selected">100</option>
+						<option value="500">500</option>
+						<option value="1000">1000</option>
+					</select> <span>Time used: <span id="timetaken"></span> ms
+					</span>
+				</div>
+
+				<strong>Marker List</strong>
+				<div id="markerlist"></div>
+			</div>
+
+			<div id="menu5" class="tab-pane fade">
+				<h3>퓨전 테이블</h3>
+				<div class="form-group">
+					<label for="usr"></label>
+				</div>
+				<button type="button" id="fetureBtn" class="btn btn-default">feature table</button>
+				<button type="button" id="heatBtn" class="btn btn-default">heatmap table</button>
+			</div>
+
+
+		</div>
+	</div>
+</body>
+</html>
